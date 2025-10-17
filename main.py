@@ -8,8 +8,10 @@ from fastapi.templating import Jinja2Templates
 from typing import Annotated
 import io
 
+# REMOVEDOR DE FONDO HECHO POR EBER JOSUE COLMENARES MENDOZA - IG:HOATSOLUCIONESTECH 
+
 app = FastAPI(
-    title="Removedor de Fondo con Pincel",
+    title="Removedor de Fondo - HOAT",
     description="Sube una imagen y pinta sobre las áreas que quieres hacer transparentes."
 )
 

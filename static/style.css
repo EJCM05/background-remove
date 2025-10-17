@@ -1,0 +1,80 @@
+/* /static/styles.css */
+
+/* --- TEMA DE COLOR PÚRPURA --- */
+:root {
+  --purple-primary: #7c3aed; /* Botones principales (morado) */
+  --purple-hover: #6d28d9;   /* Morado más oscuro para el hover */
+  --purple-text: #5b21b6;
+}
+
+/* Estilos para los botones principales (Púrpura) */
+.btn-primary {
+  background-color: var(--purple-primary);
+  border-color: var(--purple-primary);
+  color: white; /* Aseguramos que el texto sea blanco */
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background-color: var(--purple-hover);
+  border-color: var(--purple-hover);
+  color: white;
+}
+
+/* Estilos para los botones de contorno (Púrpura) */
+.btn-outline-primary {
+  color: var(--purple-text);
+  border-color: var(--purple-primary);
+}
+
+.btn-outline-primary:hover, .btn-outline-primary:focus {
+  background-color: var(--purple-primary);
+  border-color: var(--purple-primary);
+  color: white;
+}
+
+/* Cuando un botón de contorno está activo, usa los estilos del botón primario */
+.tool-btn.btn-primary {
+  background-color: var(--purple-primary);
+  border-color: var(--purple-primary);
+  color: white;
+}
+
+/* Ajuste para que el control de rango también use el color del tema */
+.form-range::-webkit-slider-thumb {
+  background-color: var(--purple-primary);
+}
+
+.form-range::-moz-range-thumb {
+  background-color: var(--purple-primary);
+}
+
+.form-range::-ms-thumb {
+  background-color: var(--purple-primary);
+}
+
+/* --- ESTILOS RESPONSIVOS PARA MÓVILES --- */
+@media (max-width: 768px) {
+  /* Reduce el padding y margen del contenedor principal para dar más espacio */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin-top: 2rem;
+  }
+
+  /* Reduce el tamaño del título principal */
+  h1 {
+    font-size: 1.875rem; /* text-3xl */
+    line-height: 2.25rem;
+  }
+
+  /* Permite el scroll horizontal en el área del editor para no deformar la imagen */
+  #editor-area {
+    overflow-x: auto;
+    padding-bottom: 10px; 
+  }
+
+  /* Fija un ancho mínimo para el área de trabajo para mantener la usabilidad */
+  #canvas-container {
+    min-width: 500px;
+  }
+}
