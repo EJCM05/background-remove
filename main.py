@@ -65,21 +65,12 @@ async def remover_fondo_con_pincel(
         h_resized, w_resized = imagen_redimensionada.shape[:2]
 
         mascara_redimensionada = cv2.resize(mascara, (w_resized, h_resized), interpolation=cv2.INTER_AREA)
-
-        # --- CAMBIO CLAVE: Lógica de la máscara para eliminar ---
-        # Ahora, queremos eliminar (hacer transparente) donde la máscara_redimensionada NO es transparente.
-        # Es decir, donde el canal alfa de la máscara del frontend tiene un valor > 0 (porque el frontend "pinta" el overlay).
-        # Los lugares donde la máscara del frontend tiene alfa=0 son los "agujeros" que queremos CONSERVAR.
-        
-        # Por lo tanto, la condición para hacer transparente la imagen final es:
-        # donde el CANAL ALFA de la MÁSCARA del frontend ES MAYOR QUE 0.
         eliminar_area_booleana = (mascara_redimensionada[:, :, 3] > 0)
         
         imagen_final = imagen_redimensionada.copy()
         
         imagen_final[eliminar_area_booleana, 3] = 0 # Establecer el alfa a 0 donde queremos eliminar
 
-        # --- Lógica: Encontrar el área del objeto y centrarlo (sin cambios, ya debería ser correcta) ---
         alpha_channel = imagen_final[:, :, 3]
         _, thresholded_alpha = cv2.threshold(alpha_channel, 0, 255, cv2.THRESH_BINARY)
         
