@@ -38,7 +38,7 @@ def resize_image_if_needed(image, max_dim=MAX_DIMENSION):
 async def leer_raiz(request: Request):
     """Sirve la página principal (index.html)."""
     return templates.TemplateResponse("index.html", {"request": request})
-
+# REMOVEDOR DE FONDO HECHO POR EBER JOSUE COLMENARES MENDOZA - IG:HOATSOLUCIONESTECH s
 @app.post("/remover-con-pincel/",
           summary="Elimina un área de una imagen usando una máscara de pincel y centra el resultado",
           tags=["Procesamiento de Imágenes"])
@@ -118,3 +118,5 @@ async def remover_fondo_con_pincel(
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    
+# Creado por EBER JOSUE COLMENARES MENDOZA - IG:HOATSOLUCIONESTECH

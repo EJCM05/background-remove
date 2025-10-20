@@ -1,4 +1,5 @@
-# Aplicación para Eliminar Fondos 🖌️
+![IMAGENREMOVERDORDELOGOHOATEJCM](https://i.postimg.cc/k5Z9kH6p/imagen-sin-fondo-1.png)
+# Aplicación para Eliminar Fondos || EJCM-HOAT🖌️
 
 Una aplicación web interactiva construida con FastAPI y OpenCV que permite a los usuarios eliminar fondos de imágenes de manera precisa. Los usuarios pueden subir una imagen y utilizar herramientas de selección intuitivas (pincel, borrador, rectángulo, círculo) para definir el área que desean conservar. La imagen resultante se recorta y centra automáticamente en un lienzo limpio.
 
