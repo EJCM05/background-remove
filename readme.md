@@ -6,6 +6,8 @@
 
 Una aplicación web interactiva construida con FastAPI y OpenCV que permite a los usuarios eliminar fondos de imágenes de manera precisa. Los usuarios pueden subir una imagen y utilizar herramientas de selección intuitivas (pincel, borrador, rectángulo, círculo) para definir el área que desean conservar. La imagen resultante se recorta y centra automáticamente en un lienzo limpio.
 
+Desplegado en render: [https://background-remove-zjto.onrender.com](https://background-remove-zjto.onrender.com)
+
 ## ✨ Características Principales
 
 *   **Interfaz Moderna y Responsiva:** Construida con Bootstrap 5 y Tailwind CSS para una experiencia de usuario fluida en dispositivos de escritorio y móviles.
