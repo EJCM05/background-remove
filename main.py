@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import uvicorn
 from fastapi import FastAPI, File, UploadFile, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -14,6 +15,24 @@ app = FastAPI(
     title="Removedor de Fondo - HOAT",
     description="Sube una imagen y pinta sobre las áreas que quieres hacer transparentes."
 )
+
+# --- AÑADE ESTE BLOQUE COMPLETO PARA PRODUCCIÓN ---
+# Esto permite que tu app en Render reciba peticiones de cualquier navegador
+origins = [
+    # "*", # Permite todas las conexiones.
+    # Cuando tengas tu URL final, puedes reemplazar "*" por ella:
+    "https://background-remove-zjto.onrender.com/" 
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"], # Permite POST, GET, etc.
+    allow_headers=["*"], # Permite todas las cabeceras
+)
+# --- FIN DEL BLOQUE CORS ---
+
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="static")
@@ -38,7 +57,7 @@ def resize_image_if_needed(image, max_dim=MAX_DIMENSION):
 async def leer_raiz(request: Request):
     """Sirve la página principal (index.html)."""
     return templates.TemplateResponse("index.html", {"request": request})
-
+# REMOVEDOR DE FONDO HECHO POR EBER JOSUE COLMENARES MENDOZA - IG:HOATSOLUCIONESTECH s
 @app.post("/remover-con-pincel/",
           summary="Elimina un área de una imagen usando una máscara de pincel y centra el resultado",
           tags=["Procesamiento de Imágenes"])
