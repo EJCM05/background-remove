@@ -19,7 +19,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="static")
 
 MAX_DIMENSION = 1024 # Máxima dimensión para redimensionar la imagen de entrada
-OUTPUT_CANVAS_SIZE = 512 # Tamaño del canvas de salida para centrar el objeto
+OUTPUT_CANVAS_SIZE = 1024 # TAMAÑO DE SALIDA CORREGIDO A 1024x1024
 
 def resize_image_if_needed(image, max_dim=MAX_DIMENSION):
     """Redimensiona una imagen si excede las dimensiones máximas, manteniendo la proporción."""
@@ -38,7 +38,7 @@ def resize_image_if_needed(image, max_dim=MAX_DIMENSION):
 async def leer_raiz(request: Request):
     """Sirve la página principal (index.html)."""
     return templates.TemplateResponse("index.html", {"request": request})
-# REMOVEDOR DE FONDO HECHO POR EBER JOSUE COLMENARES MENDOZA - IG:HOATSOLUCIONESTECH s
+
 @app.post("/remover-con-pincel/",
           summary="Elimina un área de una imagen usando una máscara de pincel y centra el resultado",
           tags=["Procesamiento de Imágenes"])
@@ -49,6 +49,7 @@ async def remover_fondo_con_pincel(
     try:
         contenido_imagen = await archivo_imagen.read()
         np_array_imagen = np.frombuffer(contenido_imagen, np.uint8)
+        # Decodifica la imagen. Acepta JPG, PNG, WEBP, etc.
         imagen = cv2.imdecode(np_array_imagen, cv2.IMREAD_UNCHANGED)
 
         contenido_mascara = await archivo_mascara.read()
@@ -58,19 +59,28 @@ async def remover_fondo_con_pincel(
         if imagen is None or mascara is None:
             raise HTTPException(status_code=400, detail="No se pudo decodificar la imagen o la máscara.")
 
-        if imagen.shape[2] != 4:
+        # --- LÓGICA DE OPTIMIZACIÓN DE FORMATO ---
+        # Asegura que la imagen de entrada sea siempre BGRA (4 canales)
+        if len(imagen.shape) == 2: # Si es Grayscale
+            imagen = cv2.cvtColor(imagen, cv2.COLOR_GRAY2BGRA)
+        elif len(imagen.shape) == 3 and imagen.shape[2] == 3: # Si es BGR (ej. un JPG)
             imagen = cv2.cvtColor(imagen, cv2.COLOR_BGR2BGRA)
+        # Si ya tiene 4 canales (BGRA), no se hace nada.
+        # --- FIN DE LA LÓGICA ---
 
         imagen_redimensionada = resize_image_if_needed(imagen)
         h_resized, w_resized = imagen_redimensionada.shape[:2]
 
         mascara_redimensionada = cv2.resize(mascara, (w_resized, h_resized), interpolation=cv2.INTER_AREA)
+        
+        # La lógica de la máscara (eliminar donde el overlay NO es transparente) es correcta
         eliminar_area_booleana = (mascara_redimensionada[:, :, 3] > 0)
         
         imagen_final = imagen_redimensionada.copy()
         
         imagen_final[eliminar_area_booleana, 3] = 0 # Establecer el alfa a 0 donde queremos eliminar
 
+        # --- Lógica de centrado ---
         alpha_channel = imagen_final[:, :, 3]
         _, thresholded_alpha = cv2.threshold(alpha_channel, 0, 255, cv2.THRESH_BINARY)
         
@@ -82,9 +92,11 @@ async def remover_fondo_con_pincel(
 
             objeto_recortado = imagen_final[y:y+h_obj, x:x+w_obj]
 
+            # El canvas de salida ahora es de 1024x1024
             output_canvas = np.zeros((OUTPUT_CANVAS_SIZE, OUTPUT_CANVAS_SIZE, 4), dtype=np.uint8)
 
             scale_factor = 1.0
+            # Escalar si es más grande que el 90% del canvas de salida
             if w_obj > OUTPUT_CANVAS_SIZE * 0.9 or h_obj > OUTPUT_CANVAS_SIZE * 0.9:
                 scale_factor = min((OUTPUT_CANVAS_SIZE * 0.9) / w_obj, (OUTPUT_CANVAS_SIZE * 0.9) / h_obj)
             
@@ -96,6 +108,7 @@ async def remover_fondo_con_pincel(
             paste_x = (OUTPUT_CANVAS_SIZE - w_scaled) // 2
             paste_y = (OUTPUT_CANVAS_SIZE - h_scaled) // 2
             
+            # Lógica de pegado con transparencia (Alpha blending)
             for c in range(0, 3): # BGR
                 output_canvas[paste_y:paste_y+h_scaled, paste_x:paste_x+w_scaled, c] = \
                     objeto_escalado[:, :, c] * (objeto_escalado[:, :, 3] / 255.0) + \
@@ -106,9 +119,10 @@ async def remover_fondo_con_pincel(
 
             imagen_final = output_canvas
         else:
+            # Si no hay nada seleccionado, devuelve un canvas transparente
             imagen_final = np.zeros((OUTPUT_CANVAS_SIZE, OUTPUT_CANVAS_SIZE, 4), dtype=np.uint8)
 
-
+        # Codifica la imagen final SIEMPRE como PNG para la transparencia
         _, buffer = cv2.imencode(".png", imagen_final)
         return StreamingResponse(io.BytesIO(buffer.tobytes()), media_type="image/png")
 

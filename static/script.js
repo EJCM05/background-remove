@@ -108,10 +108,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // MEJORA: Función de coordenadas más robusta para TÁCTIL
     const getPaintPosition = (e) => {
         let event = e;
+        // e.touches para touchstart/touchmove (cuando los dedos están en la pantalla)
         if (e.touches && e.touches.length > 0) {
-            event = e.touches[0]; // Para touchstart, touchmove
+            event = e.touches[0]; 
+        // e.changedTouches para touchend (cuando el dedo se levanta)
         } else if (e.changedTouches && e.changedTouches.length > 0) {
-            event = e.changedTouches[0]; // Para touchend
+            event = e.changedTouches[0]; 
         }
         
         const rect = previewCanvas.getBoundingClientRect();
